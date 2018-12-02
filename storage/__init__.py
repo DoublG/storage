@@ -8,18 +8,10 @@ from .db import Base
 import click
 import importlib
 from jsonschema import ValidationError
+from sqlalchemy import exc
 
 
-@click.group()
-def cli():
-    pass
-
-
-@cli.command()
-@click.option('--config_root',default='Smappee')
-@click.option('--application_setting_path')
-def create_table(config_root, application_setting_path):
-
+def _load_config_file(config_root, application_setting_path):
     if application_setting_path is None:
         if 'APP_SETTINGS' not in os.environ:
             raise Exception('APP_SETTINGS env variable is {} missing.'.format(config_root))
@@ -32,34 +24,39 @@ def create_table(config_root, application_setting_path):
     if config_root not in config:
         raise Exception('section {} missing.'.format(config_root))
 
-    root = config[config_root]
+    return config[config_root]
 
-    for key in ('database_uri',) not in root.items(config_root)[1:]:
 
-        raise Exception('key {} is missing in section {}.'.format(key, config_root))
+@click.group()
+@click.pass_context
+@click.option('--config_root',default='Smappee')
+@click.option('--application_setting_path')
+def cli(ctx, config_root, application_setting_path):
+    ctx.obj['CONFIG_ROOT'] = config_root
+    ctx.obj['SETTING_PATH'] = application_setting_path
+    ctx.obj['ROOT'] = _load_config_file(config_root, application_setting_path)
+
+
+@cli.command()
+def create_table(ctx):
+    """ create db table """
+
+    config_root = ctx.obj['CONFIG_ROOT']
+    root = ctx.obj['ROOT']
+
+    if 'database_uri' not in root.keys():
+        raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
 
     some_engine = create_engine(config_root['database_uri'])
     Base.metadata.create_all(some_engine)
 
 
 @cli.command()
-@click.option('--config_root', default='Smappee')
-@click.option('--application_setting_path')
-def start(config_root, application_setting_path):
+def start(ctx):
+    """ start application """
 
-    if application_setting_path is None:
-        if 'APP_SETTINGS' not in os.environ:
-            raise Exception('APP_SETTINGS env variable is {} missing.'.format(config_root))
-
-        application_setting_path = os.environ['APP_SETTINGS']
-
-    config = configparser.ConfigParser()
-    config.read(application_setting_path)
-
-    if config_root not in config:
-        raise Exception('section {} missing.'.format(config_root))
-
-    root = config[config_root]
+    config_root = ctx.obj['CONFIG_ROOT']
+    root = ctx.obj['ROOT']
 
     invalid_keys = [i for i in ('rabbitmq_user', 'rabbitmq_password', 'rabbitmq_host', 'transform_method',
                                 'rabbitmq_exchange', 'rabbitmq_routing_key', 'database_uri') if i not in root.keys()]
@@ -91,9 +88,10 @@ def start(config_root, application_setting_path):
             session.add(transform(body))
             session.commit()
 
-            ch.basic_ack(delivery_tag=method.delivery_tag)
-        except ValidationError:
-            click.echo('Message validation failed', err=True)
+        except (ValidationError, exc.SQLAlchemyError) as ex:
+            click.echo(ex, err=True)
+
+        ch.basic_ack(delivery_tag=method.delivery_tag)  # we always confirm the message
 
     channel.basic_consume(callback, queue=queue.method.queue)
 

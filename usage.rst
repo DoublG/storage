@@ -1,7 +1,14 @@
 =======
-Storage
+Usage
 =======
-The storage application is responsible for storing rabbitmq messages in a mysql db.
+-----
+Console commands
+-----
+.. click:: storage:create_table
+   :prog: create_table
+
+.. click:: storage:start
+   :prog: start
 
 -------------
 Configuration

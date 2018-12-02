@@ -32,3 +32,6 @@ instance/
 .idea/
 
 config/
+
+# sphinx build folder
+_build

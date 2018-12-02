@@ -6,7 +6,8 @@ setup(
     author_email='erik@woidt.be',
     packages=find_packages(exclude='test'),
     name='Storage',
-    install_requires=['pika', 'jsonschema', 'SQLAlchemy==1.3.0b1', 'mysqlclient', 'click'],
+    install_requires=['pika', 'jsonschema', 'SQLAlchemy==1.3.0b1', 'mysqlclient', 'click', 'zope.interface'],
+    extras_require={'Doc': ['sphinx', 'sphinx-click']},
     include_package_data=True,
     url='',
     entry_points={
