@@ -11,7 +11,9 @@ The storage application is responsible for storing rabbitmq messages in a mysql 
    :maxdepth: 2
    :caption: Table of Contents:
 
-   usage
+   includeme
+
+..   usage
 
 Indices and tables
 ==================
