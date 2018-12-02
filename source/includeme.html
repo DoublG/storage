@@ -1,0 +1,191 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Storage &#8212; Storage  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="storage">
+<h1>Storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h1>
+<p>The storage application is responsible for storing rabbitmq messages in a mysql db.</p>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Configuration is loaded via a configuration file supplied
+via the <em>APP_SETTINGS</em> environment variable.</p>
+<p>Mandatory values in the config file.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="38%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Configuration name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><em>[&lt;RootKey]</em></td>
+<td>Root header used in <em>–config_root</em> parameter</td>
+</tr>
+<tr class="row-odd"><td><em>rabbitmq_user</em></td>
+<td>RabbitMQ user</td>
+</tr>
+<tr class="row-even"><td><em>rabbitmq_password</em></td>
+<td>RabbitMQ password</td>
+</tr>
+<tr class="row-odd"><td><em>rabbitmq_host</em></td>
+<td>RabbitMQ host</td>
+</tr>
+<tr class="row-even"><td><em>rabbitmq_exchange</em></td>
+<td>RabbitMQ exchange name</td>
+</tr>
+<tr class="row-odd"><td><em>rabbitmq_routing_key</em></td>
+<td>RabbitMQ routing key</td>
+</tr>
+<tr class="row-even"><td><em>database_uri</em></td>
+<td>SQLAlchemy uri</td>
+</tr>
+<tr class="row-odd"><td><em>transform_method</em></td>
+<td>path to transform method (.notation)</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="systemd">
+<h3>Systemd<a class="headerlink" href="#systemd" title="Permalink to this headline">¶</a></h3>
+<p><strong>/etc/systemd/system/storage.service</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">Unit</span><span class="p">]</span>
+<span class="n">Description</span><span class="o">=</span><span class="n">storage</span> <span class="n">service</span> <span class="k">for</span> <span class="n">Smappee</span>
+<span class="n">After</span><span class="o">=</span><span class="n">network</span><span class="o">.</span><span class="n">target</span>
+
+<span class="p">[</span><span class="n">Service</span><span class="p">]</span>
+<span class="n">Environment</span><span class="o">=</span><span class="s2">&quot;APP_SETTINGS=/var/www/storage/config.ini&quot;</span>
+<span class="n">ExecStart</span><span class="o">=/</span><span class="n">var</span><span class="o">/</span><span class="n">www</span><span class="o">/</span><span class="n">storage</span><span class="o">/</span><span class="n">env</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">main</span> <span class="n">start</span> <span class="o">--</span><span class="n">config_root</span> <span class="n">Smappee</span>
+<span class="n">Restart</span><span class="o">=</span><span class="n">on</span><span class="o">-</span><span class="n">failure</span>
+<span class="n">Type</span><span class="o">=</span><span class="n">simple</span>
+<span class="n">User</span><span class="o">=</span><span class="n">www</span><span class="o">-</span><span class="n">storage</span>
+<span class="n">Group</span><span class="o">=</span><span class="n">www</span><span class="o">-</span><span class="n">storage</span>
+
+<span class="p">[</span><span class="n">Install</span><span class="p">]</span>
+<span class="n">WantedBy</span><span class="o">=</span><span class="n">default</span><span class="o">.</span><span class="n">target</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="deployment">
+<h2>Deployment<a class="headerlink" href="#deployment" title="Permalink to this headline">¶</a></h2>
+<p>I’m using fabric for the deployment.</p>
+<p><strong>cleanup of the previous setup</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fab</span> <span class="o">-</span><span class="n">H</span> <span class="n">root</span><span class="nd">@100</span><span class="o">.</span><span class="mf">100.0</span><span class="o">.</span><span class="mi">2</span> <span class="n">cleanup</span><span class="o">-</span><span class="n">application</span>
+</pre></div>
+</div>
+<p><strong>update / install new application</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fab</span> <span class="o">-</span><span class="n">H</span> <span class="n">root</span><span class="nd">@100</span><span class="o">.</span><span class="mf">100.0</span><span class="o">.</span><span class="mi">2</span> <span class="n">build</span><span class="o">-</span><span class="n">application</span>
+</pre></div>
+</div>
+<p><strong>start service</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemctl</span> <span class="n">start</span> <span class="n">storage</span><span class="o">.</span><span class="n">service</span>
+</pre></div>
+</div>
+<p><strong>stop service</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemctl</span> <span class="n">stop</span> <span class="n">storage</span><span class="o">.</span><span class="n">service</span>
+</pre></div>
+</div>
+<p><strong>reload configuration</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">systemctl</span> <span class="n">daemon</span><span class="o">-</span><span class="n">reload</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Storage</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Erik Woidt.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/source/includeme.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
