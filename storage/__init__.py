@@ -1,14 +1,16 @@
-from storage.db import Smappee
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import configparser
-import os
-import pika
-from .db import Base
-import click
 import importlib
+import os
+
+import click
+import pika
 from jsonschema import ValidationError
+from sqlalchemy import create_engine
 from sqlalchemy import exc
+from sqlalchemy.orm import sessionmaker
+
+from storage.db import Smappee
+from .db import Base
 
 
 def _load_config_file(config_root, application_setting_path):
@@ -29,7 +31,7 @@ def _load_config_file(config_root, application_setting_path):
 
 @click.group()
 @click.pass_context
-@click.option('--config_root',default='Smappee')
+@click.option('--config_root', default='Smappee')
 @click.option('--application_setting_path')
 def cli(ctx, config_root, application_setting_path):
     ctx.obj['CONFIG_ROOT'] = config_root
@@ -38,6 +40,7 @@ def cli(ctx, config_root, application_setting_path):
 
 
 @cli.command()
+@click.pass_context
 def create_table(ctx):
     """ create db table """
 
@@ -52,6 +55,7 @@ def create_table(ctx):
 
 
 @cli.command()
+@click.pass_context
 def start(ctx):
     """ start application """
 
@@ -78,10 +82,14 @@ def start(ctx):
     channel.queue_bind(exchange=root['rabbitmq_exchange'],
                        queue=queue.method.queue, routing_key=root['rabbitmq_routing_key'])
 
-    path = root['transform_method']
-    module_name, _, func_name = path.rpartition('.')
-    transform = getattr(importlib.import_module(module_name), func_name)
+    try:
+        path = root['transform_method']
+        module_name, _, func_name = path.rpartition('.')
+        transform = getattr(importlib.import_module(module_name), func_name)
+    except AttributeError as ex:
+        raise Exception('method {} not found'.format(path))
 
+    # RabbitMQ callback method
     def callback(ch, method, properties, body):
         try:
             session = Session()
@@ -96,7 +104,7 @@ def start(ctx):
     channel.basic_consume(callback, queue=queue.method.queue)
 
     try:
-        click.echo('start_consuming ...')
+        click.echo('start receiving on {}'.format(queue.method.queue))
         channel.start_consuming()
     except KeyboardInterrupt:
         channel.stop_consuming()
@@ -106,4 +114,4 @@ def start(ctx):
 
 def main():
     """ console command entry point """
-    cli()
+    cli(obj={})
