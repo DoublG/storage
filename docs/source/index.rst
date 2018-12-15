@@ -13,8 +13,6 @@ The storage application is responsible for storing rabbitmq messages in a mysql 
 
    includeme
 
-..   usage
-
 Indices and tables
 ==================
 
