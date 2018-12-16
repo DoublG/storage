@@ -1,18 +1,22 @@
 from __future__ import absolute_import, unicode_literals
-from storage.celery import app
+
+import os
+
+import pandas as pd
+from celery.schedules import crontab
 from sqlalchemy import create_engine
 from sqlalchemy import func
-from . import config
-import pandas as pd
 from sqlalchemy.orm import sessionmaker
+
+from storage.celery import app
 from storage.db import Smappee
-from celery.schedules import crontab
-import os
+from . import config
 
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(crontab(hour=6, minute=0, day_of_month=1), cleanup_db.s(), name='clean the last month')
+    sender.add_periodic_task(crontab(hour=6, minute=0, day_of_month=1), cleanup_db.s(),
+                             name='Store the oldest month in a parquet file')
 
 
 @app.task
@@ -35,7 +39,8 @@ def cleanup_db():
     df = pd.read_sql(query.statement, engine)
 
     cwd = os.getcwd()
-    df.to_parquet(os.path.join(cwd, '/cold_backup/{}-{}.gzip'.format(month, year)), compression='gzip')
+    filename = os.path.join(cwd, 'cold_backup/{}-{}.gzip'.format(month, year))
+    df.to_parquet(filename, compression='gzip')
 
     # delete the last month
     query.delete(synchronize_session=False)

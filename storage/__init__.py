@@ -8,9 +8,13 @@ from jsonschema import ValidationError
 from sqlalchemy import create_engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
+from pandas import datetime
 
 from storage.db import Smappee
 from .db import Base
+
+import pandas as pd
+import pyarrow.parquet as pq
 
 
 def _load_config_file(config_root, application_setting_path):
@@ -50,8 +54,8 @@ def create_table(ctx):
     if 'database_uri' not in root.keys():
         raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
 
-    some_engine = create_engine(config_root['database_uri'])
-    Base.metadata.create_all(some_engine)
+    engine = create_engine(config_root['database_uri'])
+    Base.metadata.create_all(engine)
 
 
 @cli.command()
@@ -68,9 +72,9 @@ def start(ctx):
     for key in invalid_keys:
         raise Exception('key {} is missing in section {}.'.format(key, config_root))
 
-    some_engine = create_engine(root.get('database_uri', raw=True))
+        engine = create_engine(root.get('database_uri', raw=True))
 
-    Session = sessionmaker(bind=some_engine)
+    Session = sessionmaker(bind=engine)
 
     credentials = pika.PlainCredentials(root['rabbitmq_user'], root.get('rabbitmq_password', raw=True))
     connection = pika.BlockingConnection(
@@ -110,6 +114,58 @@ def start(ctx):
         channel.stop_consuming()
 
     connection.close()
+
+
+@cli.command()
+@click.pass_context
+def process(ctx):
+    """
+        Join parquet files to display count, min, max, mean
+    """
+    path = os.path.join(os.getcwd(), 'cold_backup')
+    click.echo('Load parquet files from folder {}'.format(path))
+
+    df = pd.DataFrame()
+
+    # load history records
+    for dirpath, dirnames, files in os.walk(os.path.abspath(path)):
+        for name in files:
+            if name.endswith('.gzip'):
+                filename = os.path.join(dirpath, name)
+                click.echo('load file {}'.format(filename))
+
+                table = pq.read_table(filename, columns=['utc_timestamp', 'total_power'])
+                click.echo('rows found {}'.format(table.num_rows))
+
+                df = df.append(table.to_pandas())
+
+    # load current data (sql)
+    config_root = ctx.obj['CONFIG_ROOT']
+    root = ctx.obj['ROOT']
+
+    if 'database_uri' not in root.keys():
+        raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
+
+    engine = create_engine(root.get('database_uri', raw=True))
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    query = session.query(Smappee.utc_timestamp, Smappee.total_power)
+
+    pd_df = pd.read_sql(query.statement, engine)
+    click.echo('{} rows selected from db'.format(len(pd_df)))
+
+    df = df.append(pd_df)
+
+    # create day column
+    df['day'] = df["utc_timestamp"].apply(lambda d: datetime(year=d.year, month=d.month, day=d.day))
+
+    df.set_index(df["day"], inplace=True)
+
+    # get overview of all the records
+    power_overview = df['total_power'].resample('D').agg(['count', 'min', 'max', 'mean']).round(2)
+
+    click.echo(power_overview)
 
 
 def main():

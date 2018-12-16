@@ -13,7 +13,7 @@ setup(
     url='',
     entry_points={
         'console_scripts': [
-            'main = storage:main',
+            'main = storage:main'
         ]
     }
 )
