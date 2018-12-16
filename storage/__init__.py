@@ -9,6 +9,8 @@ from sqlalchemy import create_engine
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
 from pandas import datetime
+from sqlalchemy import func
+
 
 from storage.db import Smappee
 from .db import Base
@@ -16,6 +18,21 @@ from .db import Base
 import pandas as pd
 import pyarrow.parquet as pq
 
+
+def _get_engine(ctx):
+    config_root = ctx.obj['CONFIG_ROOT']
+    root = ctx.obj['ROOT']
+
+    if 'database_uri' not in root.keys():
+        raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
+
+    return create_engine(root.get('database_uri', raw=True))
+
+
+def _get_session(engine):
+    Session = sessionmaker(bind=engine)
+
+    return Session
 
 def _load_config_file(config_root, application_setting_path):
     if application_setting_path is None:
@@ -48,13 +65,8 @@ def cli(ctx, config_root, application_setting_path):
 def create_table(ctx):
     """ create db table """
 
-    config_root = ctx.obj['CONFIG_ROOT']
-    root = ctx.obj['ROOT']
+    engine = _get_engine(ctx)
 
-    if 'database_uri' not in root.keys():
-        raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
-
-    engine = create_engine(config_root['database_uri'])
     Base.metadata.create_all(engine)
 
 
@@ -72,9 +84,7 @@ def start(ctx):
     for key in invalid_keys:
         raise Exception('key {} is missing in section {}.'.format(key, config_root))
 
-        engine = create_engine(root.get('database_uri', raw=True))
-
-    Session = sessionmaker(bind=engine)
+    Session = _get_session(_get_engine(ctx))
 
     credentials = pika.PlainCredentials(root['rabbitmq_user'], root.get('rabbitmq_password', raw=True))
     connection = pika.BlockingConnection(
@@ -139,31 +149,27 @@ def process(ctx):
 
                 df = df.append(table.to_pandas())
 
-    # load current data (sql)
-    config_root = ctx.obj['CONFIG_ROOT']
-    root = ctx.obj['ROOT']
-
-    if 'database_uri' not in root.keys():
-        raise Exception('key {} is missing in section {}.'.format('database_uri', config_root))
-
-    engine = create_engine(root.get('database_uri', raw=True))
-
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    query = session.query(Smappee.utc_timestamp, Smappee.total_power)
-
-    pd_df = pd.read_sql(query.statement, engine)
-    click.echo('{} rows selected from db'.format(len(pd_df)))
-
-    df = df.append(pd_df)
-
     # create day column
     df['day'] = df["utc_timestamp"].apply(lambda d: datetime(year=d.year, month=d.month, day=d.day))
+
+    # load current data (sql)
+    engine = _get_engine(ctx)
+    session = _get_session(engine)()
+    query = session.query(func.TIMESTAMP(func.DATE(Smappee.utc_timestamp)).label('day'),
+                          func.count(Smappee.total_power).label('count'),
+                          func.min(Smappee.total_power).label('min'),
+                          func.max(Smappee.total_power).label('max'),
+                          func.avg(Smappee.total_power).label('mean'))\
+        .group_by(func.TIMESTAMP(func.DATE(Smappee.utc_timestamp)))
+
+    pd_df = pd.read_sql(query.statement, engine, index_col=['day'])
+    click.echo('{} rows selected from db'.format(len(pd_df)))
 
     df.set_index(df["day"], inplace=True)
 
     # get overview of all the records
     power_overview = df['total_power'].resample('D').agg(['count', 'min', 'max', 'mean']).round(2)
+    power_overview = power_overview.append(pd_df)
 
     click.echo(power_overview)
 

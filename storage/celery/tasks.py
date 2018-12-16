@@ -44,4 +44,3 @@ def cleanup_db():
 
     # delete the last month
     query.delete(synchronize_session=False)
-
