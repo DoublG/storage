@@ -24,26 +24,6 @@ Configuration name          Description
 *transform_method*          path to transform method (.notation)
 =========================== =========================================
 
-
-Systemd
-```````
-**/etc/systemd/system/storage.service** ::
-
-    [Unit]
-    Description=storage service for Smappee
-    After=network.target
-
-    [Service]
-    Environment="APP_SETTINGS=/var/www/storage/config.ini"
-    ExecStart=/var/www/storage/env/bin/main start --config_root Smappee
-    Restart=on-failure
-    Type=simple
-    User=www-storage
-    Group=www-storage
-
-    [Install]
-    WantedBy=default.target
-
 ----------
 Deployment
 ----------
@@ -68,4 +48,18 @@ I'm using fabric for the deployment.
 **reload configuration** ::
 
     systemctl daemon-reload
+
+------------------------
+Documentation generation
+------------------------
+I've mostly based myself on the following document:
+https://daler.github.io/sphinxdoc-test/includeme.html
+
+**make documentation files**::
+
+    make html
+
+**push updated documentation to github**::
+
+    git push origin gh-pages
 

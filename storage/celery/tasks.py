@@ -7,11 +7,12 @@ import pandas as pd
 from sqlalchemy.orm import sessionmaker
 from storage.db import Smappee
 from celery.schedules import crontab
+import os
 
 
 @app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(crontab(hour=0, minute=0, day_of_month=1), cleanup_db.s(), name='clean the last month')
+    sender.add_periodic_task(crontab(hour=6, minute=0, day_of_month=1), cleanup_db.s(), name='clean the last month')
 
 
 @app.task
@@ -24,7 +25,7 @@ def cleanup_db():
     month, year = session.query(
         func.MONTH(func.min(Smappee.utc_timestamp)).label('first_month'),
         func.YEAR(func.min(Smappee.utc_timestamp)).label('first_year')
-    ).first()
+    ).one()
 
     query = session.query(Smappee) \
         .filter(func.MONTH(Smappee.utc_timestamp) == month) \
@@ -32,7 +33,9 @@ def cleanup_db():
 
     # sql to dataframe to parquet file
     df = pd.read_sql(query.statement, engine)
-    df.to_parquet('/var/www/storage/cold_backup/{}-{}.gzip'.format(month, year), compression='gzip')
+
+    cwd = os.getcwd()
+    df.to_parquet(os.path.join(cwd, '/cold_backup/{}-{}.gzip'.format(month, year)), compression='gzip')
 
     # delete the last month
     query.delete(synchronize_session=False)
