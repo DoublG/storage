@@ -1,6 +1,11 @@
-===========================
+.. _celerybeat:
+
+==========
+celerybeat
+==========
+---------------------------
 /var/www/storage/celerybeat
-===========================
+---------------------------
 ::
 
     CELERY_BIN="/var/www/storage/env/bin/celery"

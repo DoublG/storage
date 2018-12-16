@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Storage &#8212; Storage  documentation</title>
+    <title>Configuration &#8212; Storage  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Storage" href="includeme.html" />
+    <link rel="prev" title="Storage" href="includeme.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,34 +32,33 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="storage">
-<h1>Storage<a class="headerlink" href="#storage" title="Permalink to this headline">¶</a></h1>
-<p>The storage application is responsible for storing rabbitmq messages in a mysql db.</p>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Table of Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="includeme.html">Storage</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#configuration">Configuration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#deployment">Deployment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="includeme.html#console-commands">Console commands</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#systemd">Systemd</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#enviromental-files">Enviromental files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#config-files">Config files</a></li>
-</ul>
-</li>
-</ul>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="systemd">
+<h2>Systemd<a class="headerlink" href="#systemd" title="Permalink to this headline">¶</a></h2>
+<p>Systemd service files</p>
 <ul class="simple">
-<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
-<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
-<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+<li><a class="reference internal" href="celery.service.html#celery-service"><span class="std std-ref">celery.service</span></a></li>
+<li><a class="reference internal" href="celerybeat.service.html#celerybeat-service"><span class="std std-ref">celerybeat.service</span></a></li>
+<li><a class="reference internal" href="storage.service.html#storage-service"><span class="std std-ref">storage.service</span></a></li>
 </ul>
+</div>
+<div class="section" id="enviromental-files">
+<h2>Enviromental files<a class="headerlink" href="#enviromental-files" title="Permalink to this headline">¶</a></h2>
+<p>Enviromental files used in the Systemd service files.</p>
+<ul class="simple">
+<li><a class="reference internal" href="celery.html#celery"><span class="std std-ref">celery</span></a></li>
+<li><a class="reference internal" href="celerybeat.html#celerybeat"><span class="std std-ref">celerybeat</span></a></li>
+</ul>
+</div>
+<div class="section" id="config-files">
+<h2>Config files<a class="headerlink" href="#config-files" title="Permalink to this headline">¶</a></h2>
+<p>Please note that you need to adapt the <strong>&lt;CHANGEME&gt;</strong> text to your configuration.</p>
+<ul class="simple">
+<li><a class="reference internal" href="celery.ini.html#celery-ini"><span class="std std-ref">celery.ini</span></a></li>
+<li><a class="reference internal" href="config.ini.html#config-ini"><span class="std std-ref">config.ini</span></a></li>
+</ul>
+</div>
 </div>
 
 
@@ -69,7 +68,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">Storage</a></h1>
+<h1 class="logo"><a href="index.html">Storage</a></h1>
 
 
 
@@ -80,16 +79,21 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Table of Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Storage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#systemd">Systemd</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#enviromental-files">Enviromental files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#config-files">Config files</a></li>
+</ul>
+</li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="includeme.html" title="next chapter">Storage</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="includeme.html" title="previous chapter">Storage</a></li>
   </ul></li>
 </ul>
 </div>
@@ -125,7 +129,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/index.rst.txt"
+      <a href="_sources/configuration.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
