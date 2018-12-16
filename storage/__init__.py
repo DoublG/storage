@@ -3,20 +3,18 @@ import importlib
 import os
 
 import click
+import pandas as pd
 import pika
+import pyarrow.parquet as pq
 from jsonschema import ValidationError
+from pandas import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import exc
-from sqlalchemy.orm import sessionmaker
-from pandas import datetime
 from sqlalchemy import func
-
+from sqlalchemy.orm import sessionmaker
 
 from storage.db import Smappee
 from .db import Base
-
-import pandas as pd
-import pyarrow.parquet as pq
 
 
 def _get_engine(ctx):
@@ -167,11 +165,13 @@ def process(ctx):
 
     df.set_index(df["day"], inplace=True)
 
-    # get overview of all the records
-    power_overview = df['total_power'].resample('D').agg(['count', 'min', 'max', 'mean']).round(2)
+    # aggregate old records
+    power_overview = df['total_power'].resample('D').agg(['count', 'min', 'max', 'mean'])
+
+    # union the aggregated new records with the old ones
     power_overview = power_overview.append(pd_df)
 
-    click.echo(power_overview)
+    click.echo(power_overview.round(2))
 
 
 def main():
