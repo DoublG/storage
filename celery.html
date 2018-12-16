@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -7,15 +6,17 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Index &#8212; Storage  documentation</title>
+    <title>/var/www/storage/celery &#8212; Storage  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="index" title="Index" href="#" />
+    <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="/etc/systemd/system/celery.service" href="celery.service.html" />
+    <link rel="prev" title="/var/www/storage/celery.ini" href="celery.ini.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,71 +33,21 @@
 
           <div class="body" role="main">
             
+  <div class="section" id="var-www-storage-celery">
+<h1>/var/www/storage/celery<a class="headerlink" href="#var-www-storage-celery" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CELERYD_NODES</span><span class="o">=</span><span class="s2">&quot;w1&quot;</span>
+<span class="n">CELERY_BIN</span><span class="o">=</span><span class="s2">&quot;/var/www/storage/env/bin/celery&quot;</span>
+<span class="n">CELERY_APP</span><span class="o">=</span><span class="s2">&quot;storage.celery.tasks:app&quot;</span>
+<span class="n">CELERYD_MULTI</span><span class="o">=</span><span class="s2">&quot;multi&quot;</span>
+<span class="n">CELERYD_OPTS</span><span class="o">=</span><span class="s2">&quot;--time-limit=300 --concurrency=2&quot;</span>
+<span class="n">CELERYD_PID_FILE</span><span class="o">=</span><span class="s2">&quot;/tmp/%n.pid&quot;</span>
+<span class="n">CELERYD_LOG_FILE</span><span class="o">=</span><span class="s2">&quot;/var/log/celery/%n%I.log&quot;</span>
+<span class="n">CELERYD_LOG_LEVEL</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span>
 
-<h1 id="index">Index</h1>
-
-<div class="genindex-jumpbox">
- <a href="#Symbols"><strong>Symbols</strong></a>
- | <a href="#C"><strong>C</strong></a>
- | <a href="#S"><strong>S</strong></a>
- 
+<span class="n">APP_SETTINGS</span><span class="o">=</span><span class="s2">&quot;/var/www/storage/celery.ini&quot;</span>
+</pre></div>
 </div>
-<h2 id="Symbols">Symbols</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --application_setting_path &lt;application_setting_path&gt;
-
-      <ul>
-        <li><a href="includeme.html#cmdoption-create-table-application-setting-path">create_table command line option</a>
-</li>
-        <li><a href="includeme.html#cmdoption-start-application-setting-path">start command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    --config_root &lt;config_root&gt;
-
-      <ul>
-        <li><a href="includeme.html#cmdoption-create-table-config-root">create_table command line option</a>
-</li>
-        <li><a href="includeme.html#cmdoption-start-config-root">start command line option</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="C">C</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    create_table command line option
-
-      <ul>
-        <li><a href="includeme.html#cmdoption-create-table-application-setting-path">--application_setting_path &lt;application_setting_path&gt;</a>
-</li>
-        <li><a href="includeme.html#cmdoption-create-table-config-root">--config_root &lt;config_root&gt;</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
-<h2 id="S">S</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    start command line option
-
-      <ul>
-        <li><a href="includeme.html#cmdoption-start-application-setting-path">--application_setting_path &lt;application_setting_path&gt;</a>
-</li>
-        <li><a href="includeme.html#cmdoption-start-config-root">--config_root &lt;config_root&gt;</a>
-</li>
-      </ul></li>
-  </ul></td>
-</tr></table>
-
+</div>
 
 
           </div>
@@ -116,10 +67,10 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Table of Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="includeme.html">Storage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="celery.ini.html">/var/www/storage/celery.ini</a></li>
-<li class="toctree-l1"><a class="reference internal" href="celery.html">/var/www/storage/celery</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">/var/www/storage/celery</a></li>
 <li class="toctree-l1"><a class="reference internal" href="celery.service.html">/etc/systemd/system/celery.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="celerybeat.html">/var/www/storage/celerybeat</a></li>
 <li class="toctree-l1"><a class="reference internal" href="celerybeat.service.html">/etc/systemd/system/celerybeat.service</a></li>
@@ -131,6 +82,8 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="celery.ini.html" title="previous chapter">/var/www/storage/celery.ini</a></li>
+      <li>Next: <a href="celery.service.html" title="next chapter">/etc/systemd/system/celery.service</a></li>
   </ul></li>
 </ul>
 </div>
@@ -165,6 +118,9 @@
       Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.2</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
+      |
+      <a href="_sources/celery.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
 
     

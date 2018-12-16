@@ -13,6 +13,14 @@ The storage application is responsible for storing rabbitmq messages in a mysql 
 
    includeme
 
+   celery.ini
+   celery
+   celery.service
+   celerybeat
+   celerybeat.service
+   config.ini
+   storage.service
+
 Indices and tables
 ==================
 
