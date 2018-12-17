@@ -29,8 +29,8 @@ def _get_engine(ctx):
 
 def _get_session(engine):
     Session = sessionmaker(bind=engine)
-
     return Session
+
 
 def _load_config_file(config_root, application_setting_path):
     if application_setting_path is None:
