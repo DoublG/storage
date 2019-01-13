@@ -42,7 +42,7 @@ def cleanup_db():
         .filter(func.MONTH(Smappee.utc_timestamp) == month) \
         .filter(func.YEAR(Smappee.utc_timestamp) == year)
 
-    chunk_size = 50000
+    chunk_size = config['Celery'].get('chunk_size')
     columns_to_fetch = [c.name for c in Smappee.__table__.columns]
     total_rows = query.count()
 
@@ -53,6 +53,11 @@ def cleanup_db():
         return tuple(map(lambda column: getattr(row, column), columns_to_fetch))
 
     def _get_chucks(q):
+        """
+        Return the query in batches
+        :param q: SQLAlchemy Query
+        :return: list of records
+        """
         e = iter(q.yield_per(chunk_size))
         while True:
             result = []
