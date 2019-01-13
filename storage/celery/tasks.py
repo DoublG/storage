@@ -20,7 +20,7 @@ logger.add("logs/storage_tasks.log", rotation="1 hour")
 def setup_periodic_tasks(sender, **kwargs):
     sender.add_periodic_task(
         crontab(hour=6, minute=0, day_of_month=1, day_of_week='*', month_of_year="*"), cleanup_db.s(),
-            name='Store the oldest month in a parquet file')
+        name='Store the oldest month in a parquet file')
 
 
 @app.task(time_limit=3600)
@@ -75,7 +75,6 @@ def cleanup_db():
     logger.debug('Starting fetching data')
 
     for idx, chunk in enumerate(_get_chucks(query)):
-
         logger.debug('Start chunk {}', idx)
         logger.debug('{} rows to store', len(chunk))
 
