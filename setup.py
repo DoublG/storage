@@ -7,7 +7,7 @@ setup(
     packages=find_packages(exclude='test'),
     name='Storage',
     install_requires=['pika', 'jsonschema', 'SQLAlchemy==1.3.0b1',
-                      'mysqlclient', 'click', 'zope.interface', 'celery', 'pyarrow', 'pandas'],
+                      'mysqlclient', 'click', 'zope.interface', 'celery', 'pyarrow', 'pandas', 'glom', 'loguru'],
     extras_require={'Doc': ['sphinx', 'sphinx-click']},
     include_package_data=True,
     url='',

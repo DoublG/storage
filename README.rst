@@ -63,3 +63,14 @@ https://daler.github.io/sphinxdoc-test/includeme.html
 
     git push origin gh-pages
 
+---------------------------
+Celery trigger task manualy
+---------------------------
+**check status of celery**::
+
+    cd /var/www/storage
+    source env/bin/activate
+    export APP_SETTINGS=/var/www/storage/celery.ini
+    celery status -A storage.celery
+    celery inspect registered -A storage.celery
+    celery call storage.celery.tasks.cleanup_db  -A storage.celery

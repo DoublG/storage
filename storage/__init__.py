@@ -64,7 +64,6 @@ def create_table(ctx):
     """ create db table """
 
     engine = _get_engine(ctx)
-
     Base.metadata.create_all(engine)
 
 

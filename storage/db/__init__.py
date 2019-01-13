@@ -22,6 +22,6 @@ class Smappee(Base):
         locals()['phase_id{}'.format(i)] = Column(Integer)
         locals()['current{}'.format(i)] = Column(Integer)
 
-    for i in range(3): # 3 phases
+    for i in range(3):  # 3 phases
         locals()['volt{}'.format(i)] = Column(Integer)
         locals()['phase_id{}'.format(i)] = Column(Integer)

@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 
 import glom
-from glom import Coalesce, Check
+from glom import Coalesce, Check, glom
 
 from .db import Smappee
 
@@ -17,21 +17,18 @@ spec = {
 
 # Channel Power
 for i in range(6):
-    spec.update({
-        'ct_input{}'.format(i): ('channelPowers.{}.ctInput'.format(i), Check(type=int)),
-        'power{}'.format(i): ('channelPowers.{}.power'.format(i), Check(type=int)),
-        'export_energy{}'.format(i): ('channelPowers.{}.exportEnergy'.format(i), Check(type=int)),
-        'import_energy{}'.format(i): ('channelPowers.{}.importEnergy'.format(i), Check(type=int)),
-        'phase_id{}'.format(i): ('channelPowers.{}.phaseId'.format(i), Check(type=int)),
-        'current{}'.format(i): ('channelPowers.{}.current'.format(i), Check(type=int))
-    })
+    spec.update({'ct_input{}'.format(i): ('channelPowers.{}.ctInput'.format(i), Check(type=int)),
+                 'power{}'.format(i): ('channelPowers.{}.power'.format(i), Check(type=int)),
+                 'export_energy{}'.format(i): ('channelPowers.{}.exportEnergy'.format(i), Check(type=int)),
+                 'import_energy{}'.format(i): ('channelPowers.{}.importEnergy'.format(i), Check(type=int)),
+                 'phase_id{}'.format(i): ('channelPowers.{}.phaseId'.format(i), Check(type=int)),
+                 'current{}'.format(i): ('channelPowers.{}.current'.format(i), Check(type=int))})
 
 # Voltages
 for i in range(3):
     spec.update({
-        'volt{}'.format(i): Coalesce('voltages.{}.voltage'.format(i), default=None, validate=Check(type=int)),
-        'phase_id{}'.format(i): Coalesce('voltages.{}.phaseId'.format(i), default=None, validate=Check(type=int))
-    })
+        'volt{}'.format(i): (Coalesce('voltages.{}.voltage'.format(i), default=0), Check(type=int)),
+        'phase_id{}'.format(i): (Coalesce('voltages.{}.phaseId'.format(i), default=0), Check(type=int))})
 
 
 def _external_to_internal(external_dict: dict) -> dict:
@@ -43,6 +40,6 @@ def _external_to_internal(external_dict: dict) -> dict:
     return glom(external_dict, spec)
 
 
-def transform_smappee(message: dict) -> object:
+def transform_smappee(message: dict) -> Smappee:
     message_dict = json.loads(message.decode())
     return Smappee(**_external_to_internal(message_dict))

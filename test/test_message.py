@@ -7,8 +7,16 @@ from storage.format import transform_smappee
 
 class TestValidateFormat(unittest.TestCase):
 
+    def test_errors(self):
+
+        with self.assertRaises(TypeError):
+            result = transform_smappee("{}".encode('utf-8'))
+
+        with self.assertRaises(ValueError):
+            result = transform_smappee('{"utcTimeStamp": 1543156626563, channelPowers:[]}'.encode('utf-8'))
+
     @patch('storage.format.Smappee')
-    def test_validate_message(self, MockSmappee):
+    def test_validate_message(self, mock_smappee):
         message = """
             {"totalPower": 653,
                    "totalReactivePower": 501,
@@ -32,7 +40,7 @@ class TestValidateFormat(unittest.TestCase):
 
         result = transform_smappee(message)
 
-        MockSmappee.assert_called_once_with(
+        mock_smappee.assert_called_once_with(
             ct_input0=0, ct_input1=1, ct_input2=2, ct_input3=3, ct_input4=4, ct_input5=5, current0=5, current1=12,
             current2=18, current3=0, current4=1, current5=10, export_energy0=0, export_energy1=0, export_energy2=0,
             export_energy3=0, export_energy4=17727, export_energy5=2068841, import_energy0=220879977,
